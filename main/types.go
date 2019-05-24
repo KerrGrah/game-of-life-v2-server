@@ -1,6 +1,6 @@
 package main
 
-// 				X    Y
+// 				    X     Y
 type CellTable map[int][]int
 
 type Cell struct {

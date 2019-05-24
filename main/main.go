@@ -44,7 +44,7 @@ func serveGame(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Printf("Got message: %#v\n", t)
 
-		board := randPopulate(t.Height, t.Width, t.Density)
+		board := randPopulate(t.Width, t.Height, t.Density)
 
 		for {
 			err := c.WriteJSON(board)
