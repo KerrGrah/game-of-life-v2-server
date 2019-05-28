@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	MAX_SPEED float64 = 10
+	MAX_SPEED float64 = 2
 )
 
 var addr = flag.String("addr", "localhost:8080", "http service address")
@@ -44,19 +44,33 @@ func serveGame(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Printf("Got message: %#v\n", t)
 
-		board := randPopulate(t.Width, t.Height, t.Density)
+		liveCells := randPopulate(t.Width, t.Height, t.Density)
+		board := trimCellTable(liveCells, t.Width, t.Height)
+
+		err := c.WriteJSON(board)
+		if err != nil {
+			log.Println("ws send failed -- ", err)
+			return
+		}
+
+		liveCells = turn(liveCells)
+		board = trimCellTable(liveCells, t.Width, t.Height)
+
+		speed := math.Max(t.Speed, MAX_SPEED)
+		ticker := time.NewTicker(time.Millisecond * time.Duration(speed))
+
+		defer ticker.Stop()
 
 		for {
+			<-ticker.C
 			err := c.WriteJSON(board)
+			liveCells = turn(liveCells)
+			board = trimCellTable(liveCells, t.Width, t.Height)
+
 			if err != nil {
-				log.Println("ws send failed -- ", err)
+				log.Println("write:", err)
 				return
 			}
-			board = turn(board)
-
-			speed := math.Max(t.Speed, MAX_SPEED)
-
-			time.Sleep(time.Duration(speed) * time.Millisecond)
 		}
 	}
 }

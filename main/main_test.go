@@ -5,33 +5,12 @@ import (
 	"testing"
 )
 
-var testBoards = []CellTable{
-	{
-		0:  []int{1, 2, 3, 4},
-		1:  []int{1, 2, 3, 4},
-		2:  []int{1, 2},
-		10: []int{0, 4},
-	},
-	{
-		0:  []int{1, 3},
-		1:  []int{2, 4},
-		2:  []int{1, 3},
-		10: []int{2, 4},
-	},
-	{
-		0: []int{1, 4, 7, 10},
-		1: []int{3, 6, 9, 12},
-		2: []int{5, 8, 11, 14},
-		3: []int{7, 10, 13, 16},
-	},
-}
-
 func TestGetLivingNeighbourCount(t *testing.T) {
 	type CellAndExpected struct {
 		Cell
 		Expected int
 	}
-	// max return is 3 though up to 8 possible
+	// return is up to 3 as is maximum interesting value (though up to 8 possible)
 	var testList = []CellAndExpected{
 		{Cell{10, 2}, 0},
 		{Cell{1, 4}, 3},
@@ -200,7 +179,7 @@ func TestMakeEmptyBoard(t *testing.T) {
 	for _, test := range testList {
 		board := makeEmptyBoard(test.width, test.height)
 
-		if len(board) != test.height || len(board[0]) != test.width {
+		if len(board) != test.width || len(board[0]) != test.height {
 			t.Errorf("Make empty board not correct - expected %d / %d -  received %d / %d", test.width, test.height, len(board), len(board[0]))
 		}
 	}
@@ -225,5 +204,132 @@ func TestRandPopulate(t *testing.T) {
 
 	if avg > expected+lim || avg < expected-lim {
 		t.Errorf("Populate random board likely not correct - with density of %f - received avg length of %d expected %d", density, avg, expected)
+	}
+}
+
+func TestFind(t *testing.T) {
+	type ArgsAndExpected struct {
+		List     []int
+		El       int
+		Expected bool
+	}
+	testList := []ArgsAndExpected{
+		{[]int{1, 2, 3, 4, 5, 6}, 1, true},
+		{[]int{1, 2, 3, 4, 5, 6}, 7, false},
+		{[]int{1, 2, 3, 4, 5, 6}, 0, false},
+		{[]int{1, 2, 3, 4, 5, 6}, 5, true},
+		{[]int{0, 2, 4, 5, 6, 8, 9, 10, 11, 12, 17, 23, 25, 29, 31, 32, 35, 37, 38, 39, 43, 49, 52, 53, 54, 55, 58, 59, 60, 62, 63, 72, 75, 77, 78}, 78, true},
+		{[]int{0, 2, 4, 5, 6, 8, 9, 10, 11, 12, 17, 23, 25, 29, 31, 32, 35, 37, 38, 39, 43, 49, 52, 53, 54, 55, 58, 59, 60, 62, 63, 72, 75, 77, 78}, 100, false},
+	}
+
+	for _, test := range testList {
+		result := find(test.List, test.El)
+		if result != test.Expected {
+			t.Errorf("Find el in list result was incorrect - find %v in %v got: %v, want: %v.", test.List, test.El, result, test.Expected)
+		}
+	}
+}
+
+func TestFilter(t *testing.T) {
+	type ArgsAndExpected struct {
+		List     []int
+		limit    int
+		expected []int
+	}
+	testList := []ArgsAndExpected{
+		{[]int{}, 1, []int{}},
+		{[]int{1, 2, 3, 4, 5, 6}, 1, []int{}},
+		{[]int{1, 2, 3, 4, 5, 6}, 2, []int{1}},
+		{[]int{1, 2, 3, 4, 5, 6}, 3, []int{1, 2}},
+		{[]int{1, 2, 3, 4, 5, 6}, 4, []int{1, 2, 3}},
+		{[]int{1, 2, 3, 5, 6}, 5, []int{1, 2, 3}},
+		{[]int{1, 2, 3, 5, 6}, 6, []int{1, 2, 3, 5}},
+		{[]int{1, 2, 3, 5, 6}, 9, []int{1, 2, 3, 5, 6}},
+		{[]int{-2, -1, 0, 1, 2, 3, 4, 5, 6}, 3, []int{0, 1, 2}},
+		{[]int{-2, 0, 1, 2, 3, 4, 5, 6}, 3, []int{0, 1, 2}},
+		{[]int{-2, 1, 2, 3, 4, 5, 6}, 3, []int{1, 2}},
+	}
+
+	for _, test := range testList {
+		result := filter(test.List, test.limit)
+		if !reflect.DeepEqual(result, test.expected) {
+			t.Errorf("Filter arrray was incorrect - from %v limit %d got: %v, wanted: %v.", test.List, test.limit, result, test.expected)
+		}
+	}
+}
+
+func TestTrimCellTable(t *testing.T) {
+
+	type Args struct {
+		table         CellTable
+		width, height int
+	}
+	type TestInputAndExpected struct {
+		args     Args
+		expected CellTable
+	}
+
+	testList := []TestInputAndExpected{
+		{Args{testBoards[0], 1, 2}, CellTable{
+			0: []int{1},
+		}},
+		{Args{testBoards[0], 2, 2}, CellTable{
+			0: []int{1},
+			1: []int{1},
+		}},
+		{Args{testBoards[0], 3, 3}, CellTable{
+			0: []int{1, 2},
+			1: []int{1, 2},
+			2: []int{1, 2},
+		}},
+		{Args{testBoards[4], 3, 6}, CellTable{
+			0: []int{1, 4},
+			1: []int{3},
+		}},
+		{Args{testBoards[4], 5, 11}, CellTable{
+			0: []int{1, 4, 7, 10},
+			1: []int{3, 6, 9},
+			3: []int{7, 10},
+		}},
+	}
+	for _, test := range testList {
+		result := trimCellTable(test.args.table, test.args.width, test.args.height)
+
+		if !reflect.DeepEqual(result, test.expected) {
+			t.Errorf("Table trim not correct - input %v, %d / %d,  and received %v, expected %v", test.args.table, test.args.height, test.args.width, result, test.expected)
+		}
+	}
+}
+
+func TestTrimArray(t *testing.T) {
+
+	type Args struct {
+		arr   []int
+		limit int
+	}
+	type TestInputAndExpected struct {
+		args     Args
+		expected []int
+	}
+
+	testList := []TestInputAndExpected{
+		{Args{[]int{}, 0}, []int{}},
+		{Args{[]int{}, 100}, []int{}},
+		{Args{[]int{-4, 0}, 100}, []int{0}},
+		{Args{[]int{0, 1, 2, 3}, 1}, []int{0}},
+		{Args{[]int{3, 6, 9, 12}, 11}, []int{3, 6, 9}},
+		{Args{[]int{-3, -2}, 100}, []int{}},
+		{Args{[]int{-3, 0, 1, 2, 3}, 1}, []int{0}},
+		{Args{[]int{-3, 0, 1, 2, 3}, 2}, []int{0, 1}},
+		{Args{[]int{-3, -2, -1, 0, 1, 2, 3}, 8}, []int{0, 1, 2, 3}},
+		{Args{[]int{-3, -2, -1, 0, 1, 2, 3, 6, 7}, 5}, []int{0, 1, 2, 3}},
+		{Args{[]int{-3, -2, -1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 8}, []int{1, 2, 3, 4, 5, 6, 7}},
+	}
+	for _, test := range testList {
+		result := trimArray(test.args.arr, test.args.limit)
+
+		if !reflect.DeepEqual(result, test.expected) {
+			t.Errorf("Array trim not correct - input %v, height %v and received %v, expected %v", test.args.arr, test.args.limit, result, test.expected)
+		}
 	}
 }

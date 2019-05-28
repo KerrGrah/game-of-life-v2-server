@@ -1,9 +1,11 @@
 package main
 
-import "sort"
+import (
+	"sort"
+)
 
 func copyArray(arr []int) []int {
-	return append(arr[:0:0], arr...)
+	return append(make([]int, 0, len(arr)), arr...)
 }
 
 func deepCopyCellTable(table CellTable) (result CellTable) {
@@ -14,9 +16,14 @@ func deepCopyCellTable(table CellTable) (result CellTable) {
 	return
 }
 
-// TODO if list is sorted could return false when v > el
 func find(list []int, el int) bool {
 	for _, v := range list {
+		if v < el {
+			continue
+		}
+		if v > el {
+			return false
+		}
 		if v == el {
 			return true
 		}
@@ -38,3 +45,52 @@ func mergeWithoutDuplicates(a, b []int) []int {
 	return result
 }
 
+func findMinIndex(list []int) int {
+	for i, v := range list {
+		if v >= 0 {
+			return i
+		}
+	}
+	return 0
+}
+
+func findMaxIndex(list []int, limit int) int {
+	lastI := len(list) - 1
+
+	for i, v := range list {
+		if v >= limit {
+			return i
+		}
+		if i == lastI {
+			if v < 0 {
+				return 0
+			}
+		}
+	}
+	return len(list)
+}
+
+func trimArray(arr []int, limit int) []int {
+	if len(arr) == 0 {
+		return arr
+	}
+
+	minI := findMinIndex(arr)
+	maxI := findMaxIndex(arr, limit)
+
+	result := make([]int, len(arr))
+	copy(result, arr)
+
+	return result[minI:maxI]
+}
+
+func trimCellTable(table CellTable, width, height int) (result CellTable) {
+	result = CellTable{}
+	for x := range make([]int, width) {
+		trimmed := trimArray(table[x], height)
+		if len(trimmed) != 0 {
+			result[x] = trimmed
+		}
+	}
+	return
+}

@@ -10,12 +10,13 @@ func getRandBool(density float32) bool {
 }
 
 func turn(liveCells CellTable) CellTable {
+	// estimateDensity
 	potentialLiveCells := getPotentialLiveCells(liveCells)
 	nextLiving := getNextLivingCells(potentialLiveCells, liveCells)
 	return nextLiving
 }
 
-func makeEmptyBoard(height, width int) CellTable {
+func makeEmptyBoard(width, height int) CellTable {
 	board := CellTable{}
 
 	for xKey := range make([]int, width) {
@@ -37,7 +38,6 @@ func randPopulate(width, height int, density float32) CellTable {
 	}
 	return board
 }
-
 
 //for every live cell get live neighbour count - break at 4, when overcrowding occurs
 func getLivingNeighbourCount(liveCells CellTable, cell Cell) (count int) {
@@ -112,7 +112,6 @@ func getPotentialLiveCells(liveCells CellTable) CellTable {
 	return result
 }
 
-
 func getNextLivingCells(potentialLiveCells CellTable, liveCells CellTable) CellTable {
 	nextLiveCells := CellTable{}
 
@@ -133,4 +132,3 @@ func getNextLivingCells(potentialLiveCells CellTable, liveCells CellTable) CellT
 	}
 	return nextLiveCells
 }
-
