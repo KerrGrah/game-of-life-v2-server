@@ -1,0 +1,104 @@
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans');
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+
+body {
+    position: relative;
+    text-align: center;
+    margin-top: 0;
+    background-color: #333;
+    color: #EEE;
+    white-space: nowrap;
+    font-family: 'Open Sans', sans-serif;
+    outline: none;
+    user-select: none;
+}
+
+button {
+    position: relative;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    outline: none;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 16px;
+    background-color: #222;
+    color: #eee;
+    margin: 4px;
+    border: none;
+    font-weight: 200;
+    transition: all 0.3s ease-in-out;
+}
+
+button:hover {
+    transform: scale(1.05);
+    background-color: #111;
+}
+
+.btn-Start {
+    background-color: #98FB98;
+    color: black;
+}
+
+.btn-Start:hover {
+    background-color: #88e188;
+}
+
+.btn-Stop {
+    background-color: red;
+}
+
+.btn-Stop:hover {
+    background-color: firebrick;
+}
+
+
+
+
+
+/**/
+
+
+
+.buttons-container {
+    position: relative;
+    display: inline-block;
+    margin-right: 60px;
+}
+
+.slider-container {
+    position: relative;
+    top: 10px;
+    display: inline-block;
+    margin-left: 60px;
+}
+
+
+
+/*export const Slider= styled.input``*/
+/*export const Slider= styled.div``*/
+
+input[type="range"] {
+    -webkit-appearance: none;
+    background-color: black;
+    height: 3px;
+    position: relative;
+    bottom: 5px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    position: relative;
+    bottom: 1px;
+    width: 7px;
+    height: 14px;
+    cursor: pointer;
+    -webkit-box-shadow: 0 6px 5px 0 rgba(0, 0, 0, 0.6);
+    -moz-box-shadow: 0 6px 5px 0 rgba(0, 0, 0, 0.6);
+    box-shadow: 0 6px 5px 0 rgba(0, 0, 0, 0.6);
+    border-radius: 20%;
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #eee), color-stop(60%, #aaa), color-stop(61%, #000), color-stop(100%, #fff));
+}
+
+input[type=range]:focus {
+    outline: none;
+}

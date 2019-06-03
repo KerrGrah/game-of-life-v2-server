@@ -1,1 +1,15 @@
+client/build
+
+node_modules
+
+yarn-debug.log*
+yarn-error.log*
+yarn-error.integrity*
+
 .DS_Store
+
+server/server
+
+.idea/*
+
+*.d.ts
