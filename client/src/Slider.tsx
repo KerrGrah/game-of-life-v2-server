@@ -1,6 +1,7 @@
 import * as React from "react";
-import { SliderWrap } from "./styles";
 import { ChangeEvent, FC } from "react";
+import { capitalize } from "lodash";
+import { SliderInput, SliderLabel, SliderWrap } from "./styles";
 
 type Props = {
   name: string;
@@ -18,8 +19,8 @@ export const Slider: FC<Props> = ({
 }) => {
   return (
     <SliderWrap>
-      <label>{name}</label>
-      <input
+      <SliderLabel>{capitalize(name)}</SliderLabel>
+      <SliderInput
         type="range"
         min={range.min}
         max={range.max}

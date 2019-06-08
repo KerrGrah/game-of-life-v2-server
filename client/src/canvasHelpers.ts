@@ -1,4 +1,4 @@
-import { GameSetup, LiveCells } from "./types";
+import { CellEntries, GameSetup, LiveCells } from "./types";
 import { theme } from "./theme";
 
 export const makeCanvasHelpers = ({ width, height, cellSize }: GameSetup) => {
@@ -24,30 +24,46 @@ export const makeCanvasHelpers = ({ width, height, cellSize }: GameSetup) => {
       ctx.strokeStyle = theme.bgBorder;
       ctx.stroke();
     },
+
     setGameCanvasStyle: (ctx: CanvasRenderingContext2D) => {
       ctx.fillStyle = theme.liveCellColor;
     },
+
     setDimensions: (canvas: HTMLCanvasElement) => {
       canvas.width = calcWidth;
       canvas.height = calcHeight;
     },
+
     getContext: (canvas: HTMLCanvasElement) => canvas.getContext("2d"),
 
-    makePainter: (gameContext: CanvasRenderingContext2D) => (
-      gameState: LiveCells
-    ) => {
-      gameContext.clearRect(0, 0, calcWidth, calcHeight);
+    makePainter: (gameContext: CanvasRenderingContext2D) => {
+      let prevLiveCells: CellEntries;
 
-      Object.entries(gameState).forEach(([xKey, yRow]: [string, number[]]) => {
-        yRow.forEach(yKey => {
-          gameContext.fillRect(
-            +xKey * cellSize,
-            yKey * cellSize,
-            cellSize,
-            cellSize
-          );
+      const painter = (cellEntries: CellEntries = [], color: string) => {
+        gameContext.fillStyle = color;
+
+        cellEntries.forEach(([xKey, yRow]: [string, number[]]) => {
+          yRow.forEach(yKey => {
+            gameContext.fillRect(
+              +xKey * cellSize,
+              yKey * cellSize,
+              cellSize,
+              cellSize
+            );
+          });
         });
-      });
+      };
+
+      return (gameState: LiveCells = []) => {
+        gameContext.clearRect(0, 0, calcWidth, calcHeight);
+
+        const liveCells = Object.entries(gameState);
+
+        painter(prevLiveCells, "pink");
+        painter(liveCells, "black");
+
+        prevLiveCells = liveCells;
+      };
     }
   };
 };

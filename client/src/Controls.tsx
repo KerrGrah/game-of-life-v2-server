@@ -1,10 +1,11 @@
 import * as React from "react";
-import { ChangeEvent, Dispatch, FC, SetStateAction } from "react";
+import { ChangeEvent, Dispatch, FC, memo, SetStateAction } from "react";
 import { GameSetup } from "./types";
 import { ControlsContainer } from "./styles";
 import Slider from "./Slider";
 
 type Props = {
+  gameOn: boolean;
   gameSetup: GameSetup;
   setGameSetup: Dispatch<SetStateAction<GameSetup>>;
 };
@@ -12,6 +13,7 @@ type Props = {
 const Controls: FC<Props> = props => {
   const {
     setGameSetup,
+    gameOn,
     gameSetup,
     gameSetup: { width, height, speed, density }
   } = props;
@@ -19,8 +21,7 @@ const Controls: FC<Props> = props => {
   const handleSlider = ({ target }: ChangeEvent<HTMLInputElement>) => {
     setGameSetup({ ...gameSetup, [target.name]: +target.value });
   };
-    console.log('density', density)
-    
+
   return (
     <ControlsContainer>
       <Slider
@@ -38,6 +39,7 @@ const Controls: FC<Props> = props => {
       <Slider
         value={density}
         name="density"
+        disabled={gameOn}
         range={{ min: 0, max: 1 }}
         step={0.01}
         handleChange={handleSlider}
@@ -52,4 +54,4 @@ const Controls: FC<Props> = props => {
   );
 };
 
-export default Controls;
+export default memo(Controls);

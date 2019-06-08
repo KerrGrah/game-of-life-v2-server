@@ -1,7 +1,7 @@
 import * as React from "react";
 import { FC, useCallback, useEffect, useRef, useState } from "react";
 import { useBoolean, useNumber } from "react-hanger";
-import { Dictionary, GameSetup, LiveCells } from "./types";
+import { GameSetup, LiveCells } from "./types";
 import CanvasWrap from "./CanvasWrap";
 import { AppWrap, GameOnButton } from "./styles";
 import Controls from "./Controls";
@@ -15,7 +15,7 @@ const INITIAL_GAME_SETUP: GameSetup = {
   width: 150,
   height: 70,
   density: 0.4,
-  speed: 1025,
+  speed: 1025, // 25 - 1025
   cellSize: 10
 };
 
@@ -85,7 +85,11 @@ const App: FC = () => {
       <GameOnButton gameOn={gameOn.value} onClick={gameOn.toggle}>
         {buttonText}
       </GameOnButton>
-      <Controls gameSetup={gameSetup} setGameSetup={setGameSetup} />
+      <Controls
+        gameSetup={gameSetup}
+        setGameSetup={setGameSetup}
+        gameOn={gameOn.value}
+      />
     </AppWrap>
   );
 };

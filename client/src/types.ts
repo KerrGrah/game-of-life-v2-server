@@ -1,5 +1,3 @@
-import { string } from "prop-types";
-
 export type GameSetup = {
   width: number;
   height: number;
@@ -9,5 +7,7 @@ export type GameSetup = {
 };
 
 export type LiveCells = { [key: number]: number[] };
+
+export type CellEntries = [string, number[]][];
 
 export type Dictionary<T> = { [key: string]: T };
