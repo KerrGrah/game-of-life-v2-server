@@ -16,7 +16,8 @@ const INITIAL_GAME_SETUP: GameSetup = {
   height: 70,
   density: 0.4,
   speed: 1025, // 25 - 1025
-  cellSize: 10
+  cellSize: 10,
+  initiate: true
 };
 
 const App: FC = () => {
@@ -47,6 +48,7 @@ const App: FC = () => {
       socket.current.onerror = console.error;
       socket.current.onopen = () => {
         socketSend(prepareGameSetup(gameSetup), socket.current);
+        setGameSetup({ ...gameSetup, initiate: false });
       };
       generations.setValue(0);
     },

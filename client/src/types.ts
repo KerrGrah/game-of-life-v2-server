@@ -4,6 +4,7 @@ export type GameSetup = {
   cellSize: number;
   density: number;
   speed: number;
+  initiate: boolean;
 };
 
 export type LiveCells = { [key: number]: number[] };
