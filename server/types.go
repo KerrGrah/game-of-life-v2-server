@@ -8,8 +8,9 @@ type Cell struct {
 }
 
 type GameSetup struct {
-	Width   int
-	Height  int
-	Density float32
-	Speed   float64
+	Width    int
+	Height   int
+	Density  float32
+	Speed    float64
+	Initiate bool
 }

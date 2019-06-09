@@ -18,14 +18,17 @@ var addr = flag.String("addr", "localhost:8080", "http service address")
 
 var upgrader = websocket.Upgrader{} // use default options
 
-func read(c *websocket.Conn, t GameSetup) GameSetup {
-	err := c.ReadJSON(&t)
-	if err != nil {
-		fmt.Println("Error reading json.", err)
+func read(c *websocket.Conn, tChan chan (GameSetup)) {
+	t := GameSetup{}
+	for {
+		err := c.ReadJSON(&t)
+		if err != nil {
+			log.Print("read client failed -- ", err)
+			return
+		}
+		fmt.Printf("Got message: %#v\n", t)
+		tChan <- t
 	}
-
-	fmt.Printf("Got message: %#v\n", t)
-	return t
 }
 
 func makeTicker(inputSpeed float64) *time.Ticker {
@@ -46,25 +49,23 @@ func serveGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	defer c.Close()
+	defer func() {
+		err := c.Close()
 
-	t := GameSetup{}
-
-	t = read(c, t)
-
-	tChan := make(chan GameSetup)
-
-	go func() {
-		for {
-			tChan <- read(c, t)
+		if err != nil {
+			log.Print("ws upgrade failed -- ", err)
+			return
 		}
 	}()
 
-	liveCells := randPopulate(t.Width, t.Height, t.Density)
-	board := trimCellTable(liveCells, t.Width, t.Height)
+	liveCells := CellTable{}
+	board := CellTable{}
 
-	ticker := makeTicker(t.Speed)
-	defer ticker.Stop()
+	ticker := time.Ticker{}
+	t := GameSetup{}
+	tChan := make(chan GameSetup)
+
+	go read(c, tChan)
 
 	for {
 		select {
@@ -79,7 +80,22 @@ func serveGame(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		case t = <-tChan:
-			ticker = makeTicker(t.Speed)
+			if t.Initiate {
+				liveCells = randPopulate(t.Width, t.Height, t.Density)
+				board = trimCellTable(liveCells, t.Width, t.Height)
+
+				err := c.WriteJSON(board)
+				if err != nil {
+					log.Println("error in write initial board state:", err)
+					return
+				}
+				ticker = *makeTicker(t.Speed)
+				defer ticker.Stop()
+
+				liveCells = turn(liveCells)
+			} else {
+				ticker = *makeTicker(t.Speed)
+			}
 		}
 	}
 
